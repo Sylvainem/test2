@@ -1,6 +1,8 @@
 # _test2_
 
-A small starter project initialized for learning and rapid development.
+學院上課測試1
+
+
 
 ## Overview
 This workspace contains a minimal static web app with a clean landing page and a simple interactive button.
