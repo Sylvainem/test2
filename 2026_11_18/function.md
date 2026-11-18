@@ -1,338 +1,417 @@
-# Python 函式呼叫（Function Call）：一步一步練習
+# Python 函式呼叫與參數語法完全說明書
 
-這份教材會帶你認識 Python 呼叫函式（Function）的各種方式，並看懂在函式說明或定義中常見的特殊符號：`/`、`*`、`*args`、`**kwargs`。請打開 VS Code 或終端機，跟著每個步驟實際執行範例看看結果。
+本教材依據 [`function.ipynb`](file:///C:/Users/User/Desktop/暫存資料夾/test2/2026_11_18/function.ipynb) 課堂實作程式碼編寫，以循序漸進的方式，帶你徹底掌握 Python 函式（Function）的各種呼叫方式，並看懂函式簽章中常見的特殊符號：`/`、`*`、`*args`、`**kwargs` 以及解包（Unpacking）技巧。
 
-## 前置觀念：參數（Parameter）與引數（Argument）
+---
 
-在開始之前，先釐清兩個常一起出現的名詞：
+## 目錄
+- [一、核心前置觀念：參數 (Parameter) vs 引數 (Argument)](#一核心前置觀念參數-parameter-vs-引數-argument)
+- [二、基礎呼叫方式](#二基礎呼叫方式)
+  - [2.1 依位置呼叫（Positional Arguments）](#21-依位置呼叫positional-arguments)
+  - [2.2 依名稱呼叫（Keyword Arguments）](#22-依名稱呼叫keyword-arguments)
+  - [2.3 混用規則：位置引數必在關鍵字引數之前](#23-混用規則位置引數必在關鍵字引數之前)
+  - [2.4 搭配預設參數值（Default Arguments）](#24-搭配預設參數值default-arguments)
+- [三、特殊符號：限制傳遞方式（`/` 與 `*`）](#三特殊符號限制傳遞方式-與-)
+  - [3.1 僅限位置參數：`/` (Positional-Only)](#31-僅限位置參數--positional-only)
+  - [3.2 僅限關鍵字參數：`*` (Keyword-Only)](#32-僅限關鍵字參數--keyword-only)
+  - [3.3 綜合切分：`/` 與 `*` 同時並存](#33-綜合切分-與--同時並存)
+- [四、任意引數的打包（Packing）：`*args` 與 `**kwargs`](#四任意引數的打包packingargs-與-kwargs)
+  - [4.1 `*args`：將多餘位置引數打包為 Tuple](#41-args將多餘位置引數打包為-tuple)
+  - [4.2 `**kwargs`：將多餘關鍵字引數打包為 Dict](#42-kwargs將多餘關鍵字引數打包為-dict)
+  - [4.3 函式參數宣告的標準完整順序](#43-函式參數宣告的標準完整順序)
+- [五、實戰解讀 Python 內建函式簽章](#五實戰解讀-python-內建函式簽章)
+  - [5.1 `print()` 函式解析與 `sep` / `end` 應用](#51-print-函式解析與-sep--end-應用)
+  - [5.2 `sorted()` 函式解析與 `reverse` 應用](#52-sorted-函式解析與-reverse-應用)
+- [六、進階呼叫技巧：引數解包（Unpacking）](#六進階呼叫技巧引數解包unpacking)
+- [七、特殊符號速查對照表](#七特殊符號速查對照表)
+- [八、常見錯誤與 Traceback 排除指南](#八常見錯誤與-traceback-排除指南)
+- [九、課堂自我檢測題（附詳解）](#九課堂自我檢測題附詳解)
 
-- **參數（Parameter）**：**定義函式**時，寫在 `def 函式名稱(...)` 括號裡的變數名稱（像空白表格上的欄位名稱）。
-- **引數（Argument）**：**呼叫函式**時，實際填進括號裡的資料值（像真正填入表格的內容）。
+---
 
+## 一、核心前置觀念：參數 (Parameter) vs 引數 (Argument)
+
+在學習函式時，初學者常混淆這兩個名詞。請務必建立清楚的認知邊界：
+
+- **參數 (Parameter / 形參)**：**定義函式時**宣告在 `def 函式名稱(...)` 括號內的變數名稱（如同空白表格中的「欄位名稱」）。
+- **引數 (Argument / 實參)**：**呼叫函式時**實際填入括號內的值或物件（如同填入表格欄位中的「真實資料」）。
+
+### 程式碼範例 (`Cell 1`)
 ```python
-# 定義函式時，括號裡的 name 是「參數」(Parameter)
+# 定義函式時，括號內的 name 是「參數」(Parameter)
 def greet(name):
-    print(f"哈囉，{name}！")
+    print(f"哈囉,{name}!")
 
-# 呼叫函式時，實際傳進去的 "小明" 是「引數」(Argument)
-greet("小明")
+# 呼叫函式時，傳入的 "小明" 是「引數」(Argument)
+greet("小明")  # 輸出：哈囉,小明!
 ```
+
+> [!NOTE]
+> 一句話記憶法：「**定**義寫**參**數，**呼**叫傳**引**數」。
 
 ---
 
-## 第 1 步：依「引數位置」呼叫（Positional Arguments）
+## 二、基礎呼叫方式
 
-最常見的呼叫方式，就是直接把值放進括號裡。Python 會依照呼叫時排列的**先後順序**，從左到右一對一對應到函式定義的參數位置：
+### 2.1 依位置呼叫（Positional Arguments）
+最直觀且常用的呼叫方式。Python 會依照呼叫時引數傳入的**由左至右順序**，一對一指派給對應的參數。
 
+#### 程式碼範例 (`Cell 2-3`)
 ```python
 def describe_pet(animal, name):
     print(f"我養了一隻{animal}，牠叫做{name}。")
 
-describe_pet("貓", "小橘")   # 輸出：我養了一隻貓，牠叫做小橘。
-describe_pet("小橘", "貓")   # 位置對調了：我養了一隻小橘，牠叫做貓。
+# 正常位置傳入
+describe_pet("貓", "小橘")  # 輸出：我養了一隻貓，牠叫做小橘。
+
+# 順序對調時，語意會跟著改變
+describe_pet("小橘", "貓")  # 輸出：我養了一隻小橘，牠叫做貓。
 ```
 
-- 第 1 個引數 `"貓"` 會對應到第 1 個參數 `animal`。
-- 第 2 個引數 `"小橘"` 會對應到第 2 個參數 `name`。
-- 使用位置引數時，**順序錯了結果就會跟著錯**；如果少傳或多傳引數，Python 會回報 `TypeError`：
-
-```python
-# describe_pet("貓")             # TypeError: 少傳了 1 個必要的位置引數 name
-# describe_pet("貓", "小橘", 3)  # TypeError: 只接收 2 個位置引數，卻傳了 3 個
-```
+> [!WARNING] 常見錯誤
+> 位置引數必須**數量完全吻合**：
+> ```python
+> # 少傳引數
+> describe_pet("貓")
+> # TypeError: describe_pet() missing 1 required positional argument: 'name'
+>
+> # 多傳引數
+> describe_pet("貓", "小橘", 3)
+> # TypeError: describe_pet() takes 2 positional arguments but 3 were given
+> ```
 
 ---
 
-## 第 2 步：依「引數名稱」呼叫（Keyword Arguments）與預設值
+### 2.2 依名稱呼叫（Keyword Arguments）
+呼叫時明確指定 **`參數名稱=引數值`**。
 
-當函式的參數比較多、不容易記住順序時，可以在呼叫時直接寫出 **`參數名稱=值`**，這種方式稱為**引數名稱呼叫**（或**關鍵字引數**）：
-
+#### 程式碼範例 (`Cell 4-5`)
 ```python
 def describe_pet(animal, name):
     print(f"我養了一隻{animal}，牠叫做{name}。")
 
-describe_pet(animal="貓", name="小橘")
-describe_pet(name="小橘", animal="貓")  # 順序對調也完全正確！
+# 透過參數名稱指定，順序可自由調換
+describe_pet(animal="貓", name="小橘")  # 輸出：我養了一隻貓，牠叫做小橘。
+describe_pet(name="小橘", animal="貓")  # 輸出：我養了一隻貓，牠叫做小橘。
 ```
 
-- **不必死記順序**：只要名稱寫對，順序可以自由調整。
-- **可讀性高**：看呼叫的地方就知道每個值代表什麼意思。
+- **優點 1**：調換前後順序完全不影響執行結果。
+- **優點 2**：程式碼可讀性大幅提升，閱讀者一目了然每個數值所代表的意義。
 
-### 重要規則：混用時「位置引數」一定要在前面
+---
 
-位置引數和引數名稱可以混用，但**位置引數必須放在引數名稱的前面**，否則會直接出現語法錯誤（`SyntaxError`）：
+### 2.3 混用規則：位置引數必在關鍵字引數之前
+若同時使用位置引數與關鍵字引數，**位置引數必須全部排在前面**。
 
+#### 程式碼範例 (`Cell 6-7`)
 ```python
-# 正確：先傳位置引數，再傳引數名稱
-describe_pet("狗", name="旺財")
-
-# 錯誤：位置引數不能跟在引數名稱後面
-# describe_pet(animal="狗", "旺財")
-# SyntaxError: positional argument follows keyword argument
-
-# 錯誤：同一個參數不可同時用位置與名稱重複指定
-# describe_pet("狗", animal="貓")
-# TypeError: describe_pet() got multiple values for argument 'animal'
+# 正確：先傳位置引數，再傳關鍵字引數
+describe_pet("狗", name="旺財")  # 輸出：我養了一隻狗，牠叫做旺財。
 ```
 
-### 搭配預設值（Default Arguments）
+> [!CAUTION] 語法違規示範
+> 1. 位置引數排在關鍵字引數後面：
+>    ```python
+>    describe_pet(animal="狗", "旺財")
+>    # SyntaxError: positional argument follows keyword argument
+>    ```
+> 2. 重複對同一個參數指派值：
+>    ```python
+>    describe_pet("狗", animal="貓")
+>    # TypeError: describe_pet() got multiple values for argument 'animal'
+>    ```
 
-定義函式時，如果有幫參數設定預設值，呼叫時就能只改自己想調整的項目：
+---
 
+### 2.4 搭配預設參數值（Default Arguments）
+定義函式時可賦予參數預設值。呼叫時若未傳入該引數，將自動採用預設值。
+
+#### 程式碼範例 (`Cell 8-9`)
 ```python
 def order_drink(drink, ice="正常冰", sugar="半糖"):
     print(f"點餐：{drink}（{ice} / {sugar}）")
 
-order_drink("紅茶")                       # 點餐：紅茶（正常冰 / 半糖）
-order_drink("紅茶", "去冰")               # 點餐：紅茶（去冰 / 半糖）
-order_drink("紅茶", sugar="無糖")         # 跳過 ice，直接指定 sugar：點餐：紅茶（正常冰 / 無糖）
-order_drink("綠茶", sugar="微糖", ice="少冰")  # 點餐：綠茶（少冰 / 微糖）
+order_drink("紅茶")                            # 輸出：點餐：紅茶（正常冰 / 半糖）
+order_drink("紅茶", "去冰")                    # 輸出：點餐：紅茶（去冰 / 半糖）
+order_drink("紅茶", sugar="無糖")              # 輸出：點餐：紅茶（正常冰 / 無糖）
+order_drink("綠茶", sugar="微糖", ice="少冰")  # 輸出：點餐：綠茶（少冰 / 微糖）
 ```
 
-> 定義函式時，沒有預設值的參數（如 `drink`）必須寫在有預設值的參數（如 `ice`、`sugar`）前面。
+> [!TIP]
+> 結合關鍵字引數，可直接跳過中間的參數（例如跳過 `ice`），僅指定欲客製化的參數（如 `sugar="無糖"`）。
 
 ---
 
-## 第 3 步：特殊符號 `/` 與 `*` —— 限制引數的呼叫方式
+## 三、特殊符號：限制傳遞方式（`/` 與 `*`）
 
-在 VS Code 的函式提示或 Python `help()` 說明中，經常會看到參數列表裡單獨出現 `/` 或 `*`。它們本身**不是參數**，而是用來**限制呼叫者該怎麼傳入引數**的分隔符號。
+在函式定義簽章中，單獨出現的 `/` 與 `*` 不是參數本身，而是**引數傳遞模式的邊界指示符**。
 
-### 1. `/`（僅限位置引數 Positional-Only）
+### 3.1 僅限位置參數：`/` (Positional-Only)
+- 出現在 `/` **左側**的所有參數，在呼叫時**只能用位置傳入**，嚴禁寫出參數名稱。
+- 設計目的：保護內部變數名稱，避免未來修改參數名稱時破壞呼叫端；或針對如 `math.sin(x)` 等語意極度明確的運算。
 
-寫在 `/` **左邊**的所有參數，呼叫時**只能依位置傳入**，**不能寫出引數名稱**：
-
+#### 程式碼範例 (`Cell 10-11`)
 ```python
 def calc_bmi(weight, height, /):
     bmi = weight / (height ** 2)
     print(f"BMI 為：{bmi:.1f}")
 
-calc_bmi(65, 1.75)                  # 正確：依位置傳入
-# calc_bmi(weight=65, height=1.75)  # 錯誤：weight 與 height 在 / 左邊，不能寫名稱
-```
+calc_bmi(65, 1.75)  # 輸出：BMI 為：21.2
 
-若硬寫名稱，會發生 `TypeError`（表示有人把僅限位置的參數當成關鍵字引數傳入了）。
-
-- **為什麼需要 `/`？** 當參數名稱未來可能會改名（例如把 `x` 改成 `value`），或位置本身就夠直覺時，加上 `/` 可以避免呼叫端寫死參數名稱，保持彈性。
-
-### 2. `*`（僅限關鍵字引數 Keyword-Only）
-
-寫在單獨一個 `*` **右邊**的所有參數，呼叫時**必須寫出引數名稱**，**不能只靠位置傳入**：
-
-```python
-def send_email(to, *, subject, urgent=False):
-    print(f"寄給：{to}｜主旨：{subject}｜急件：{urgent}")
-
-send_email("student@example.com", subject="課堂通知", urgent=True)  # 正確
-send_email("student@example.com", subject="作業提醒")               # 正確（urgent 使用預設值）
-
-# 錯誤：subject 和 urgent 在 * 右邊，不能用位置傳入
-# send_email("student@example.com", "課堂通知", True)
-```
-
-- **為什麼需要 `*`？** 像 `urgent=True` 這種布林開關或進階選項，如果只寫 `send_email("...", "...", True)`，別人看程式碼時根本不知道 `True` 是什麼意思。加上 `*` 強迫寫出 `urgent=True`，能大幅減少傳錯欄位的機會。
-
-### 3. `/` 與 `*` 同時使用的切分規則
-
-把兩者合在一起看，可以把函式的參數分成三個區域：
-
-```text
-def 函式名稱( 僅限位置參數 , / , 位置或名稱皆可 , * , 僅限引數名稱 ):
-```
-
-實際範例：
-
-```python
-def register(id_no, /, name, *, role="student"):
-    print(f"編號：{id_no}｜姓名：{name}｜身分：{role}")
-
-# 合法的呼叫方式
-register("A01", "小明", role="leader")       # id_no 用位置；name 用位置；role 用名稱
-register("A01", name="小明", role="leader")  # id_no 用位置；name 用名稱；role 用名稱
-register("A01", "小明")                      # role 使用預設值
-
-# 不合法的呼叫方式（皆會觸發 TypeError）
-# register(id_no="A01", name="小明")         # 錯誤：id_no 在 / 左邊，只能用位置
-# register("A01", "小明", "leader")          # 錯誤：role 在 * 右邊，必須寫名稱
+# 錯誤示範（寫出名稱會引發異常）：
+# calc_bmi(weight=65, height=1.75)
+# TypeError: calc_bmi() got some positional-only arguments passed as keyword arguments: 'weight, height'
 ```
 
 ---
 
-## 第 4 步：`*args` 與 `**kwargs` —— 定義函式時接收任意數量的引數（打包 Packing）
+### 3.2 僅限關鍵字參數：`*` (Keyword-Only)
+- 出現在單獨 `*` **右側**的所有參數，在呼叫時**必須寫出參數名稱**，不得僅依位置傳值。
+- 設計目的：強制呼叫者標註參數意義，特別適合布林值開關（Boolean Flag）或進階組態設定，大幅提升閱讀性與安全性。
 
-有時候設計函式時，並不知道使用者會傳入幾個引數（例如計算任意個數字的總和，或接收額外的設定欄位）。這時候可以在定義函式時，在參數前面加上 `*` 或 `**`，把多出來的引數「打包」起來。
+#### 程式碼範例 (`Cell 12`)
+```python
+def send_email(to, *, subject, urgent=False):
+    print(f"寄給：{to}｜主旨：{subject}｜急件：{urgent}")
 
-### 1. `*args`（一個星號）：把多餘的「位置引數」打包成 `tuple`
+send_email("student@example.com", subject="課堂通知", urgent=True)
+# 輸出：寄給：student@example.com｜主旨：課堂通知｜急件：True
 
+# 錯誤示範（用位置傳遞 subject 或 urgent）：
+# send_email("student@example.com", "課堂通知", True)
+# TypeError: send_email() takes 1 positional argument but 3 were given
+```
+
+---
+
+### 3.3 綜合切分：`/` 與 `*` 同時並存
+當 `/` 與 `*` 同時存在時，參數列表被精確切分為三個區間：
+
+```text
+def 函式名稱( 僅限位置參數 , / , 位置或名稱均可 , * , 僅限引數名稱 ):
+```
+
+#### 程式碼範例 (`Cell 13-14`)
+```python
+def register(id_no, /, name, *, role="student"):
+    print(f"編號：{id_no}｜姓名：{name}｜身分：{role}")
+
+# 正確呼叫示範
+register("A01", "小明", role="leader")       # 輸出：編號：A01｜姓名：小明｜身分：leader
+register("A01", name="小明", role="leader")  # 輸出：編號：A01｜姓名：小明｜身分：leader
+register("A01", "小明")                      # 輸出：編號：A01｜姓名：小明｜身分：student
+```
+
+---
+
+## 四、任意引數的打包（Packing）：`*args` 與 `**kwargs`
+
+當設計函式時無法事先預期使用者會傳入多少引數時，使用星號語法可以在函式內部將引數「打包」為容器物件。
+
+### 4.1 `*args`：將多餘位置引數打包為 Tuple
+在參數前加上單星號 `*`，可吸收任意數量的位置引數，並組裝為一個 `tuple`。
+
+#### 程式碼範例 (`Cell 15-16`)
 ```python
 def sum_scores(*scores):
     print("收到的資料：", scores, type(scores))
     return sum(scores)
 
 print(sum_scores(80, 90, 85))
-print(sum_scores(100))
+# 輸出：
+# 收到的資料： (80, 90, 85) <class 'tuple'>
+# 255
+
+print(sum_scores(80, 90))
+# 輸出：
+# 收到的資料： (80, 90) <class 'tuple'>
+# 170
+
 print(sum_scores())
+# 輸出：
+# 收到的資料： () <class 'tuple'>
+# 0
 ```
 
-執行輸出：
+---
 
-```text
-收到的資料： (80, 90, 85) <class 'tuple'>
-255
-收到的資料： (100,) <class 'tuple'>
-100
-收到的資料： () <class 'tuple'>
-0
-```
+### 4.2 `**kwargs`：將多餘關鍵字引數打包為 Dict
+在參數前加上雙星號 `**`，可吸收任意數量的關鍵字引數，並組裝為一個 `dict`。
 
-- 呼叫時傳入的 0 個、1 個或多個**位置引數**，都會被打包進一個 `tuple`（元組）。
-- `args` 只是慣用的變數名稱（arguments 的縮寫），真正發揮作用的是前面的 **`*`**；像上面寫成 `*scores` 一樣能運作。
-
-### 2. `**kwargs`（兩個星號）：把多餘的「引數名稱」打包成 `dict`
-
+#### 程式碼範例 (`Cell 17`)
 ```python
 def build_profile(name, **info):
     print("姓名：", name)
     print("其他資料：", info, type(info))
 
 build_profile("小華", city="台北", course="Python")
+# 輸出：
+# 姓名： 小華
+# 其他資料： {'city': '台北', 'course': 'Python'} <class 'dict'>
 ```
-
-執行輸出：
-
-```text
-姓名： 小華
-其他資料： {'city': '台北', 'course': 'Python'} <class 'dict'>
-```
-
-- 呼叫時傳入的額外**關鍵字引數（`key=value`）**，都會被打包進一個 `dict`（字典）。
-- 同樣地，`kwargs` 只是慣用命名（keyword arguments 的縮寫），真正發揮作用的是前面的 **`**`**。
-
-### 3. 同時混用多種參數時的標準順序
-
-如果在同一個函式裡同時使用各種參數，必須依照以下順序定義：
-
-```python
-def demo(a, /, b, *args, c, **kwargs):
-    print(f"a={a}, b={b}, args={args}, c={c}, kwargs={kwargs}")
-
-demo(1, 2, 3, 4, c=5, x=10, y=20)
-# 輸出：a=1, b=2, args=(3, 4), c=5, kwargs={'x': 10, 'y': 20}
-```
-
-> [!TIP]
-> 注意到了嗎？`c` 寫在 `*args` 的後面，因為多餘的位置引數都會被 `*args` 吸走，所以 `c` 自動變成**僅限關鍵字引數**（呼叫時一定要寫 `c=...`），不用在 `*args` 後面再多寫一個單獨的 `*`。
 
 ---
 
-## 第 5 步：呼叫函式時的 `*` 與 `**` —— 把資料拆開傳入（拆解 Unpacking）
-
-前面第 4 步是在**定義函式**時把多餘的引數「打包」起來；反過來，如果資料已經裝在 `list`、`tuple` 或 `dict` 裡，我們也可以在**呼叫函式**時加上 `*` 或 `**`，把它們「拆開」傳進去！
-
-### 1. 呼叫時用 `*` 拆解 `list` / `tuple` 成位置引數
+### 4.3 函式參數宣告的標準完整順序
+若在同一個函式定義中包含多種參數類型，必須嚴格依照下列順序排列：
 
 ```python
-def add_three(a, b, c):
-    return a + b + c
-
-numbers = [10, 20, 30]
-
-# 如果直接寫 add_three(numbers) 會報錯，因為整個 list 只算 1 個引數
-# 加上 * 之後，會把 list 拆開成 3 個位置引數：等同於 add_three(10, 20, 30)
-print(add_three(*numbers))  # 輸出：60
+def standard_func(
+    pos_only, /,          # 1. 僅限位置參數
+    pos_or_kw,            # 2. 位置或關鍵字皆可的標準參數
+    *args,                # 3. 可變位置參數 (Tuple 打包)
+    kw_only,              # 4. 僅限關鍵字參數 (*args 之後的參數自動具備此特性)
+    **kwargs              # 5. 可變關鍵字參數 (Dict 打包)
+):
+    pass
 ```
-
-### 2. 呼叫時用 `**` 拆解 `dict` 成引數名稱
-
-```python
-def order_drink(drink, ice="正常冰", sugar="半糖"):
-    print(f"點餐：{drink}（{ice} / {sugar}）")
-
-my_order = {
-    "drink": "珍珠奶茶",
-    "ice": "少冰",
-    "sugar": "微糖",
-}
-
-# 加上 ** 之後，會把字典拆開成：order_drink(drink="珍珠奶茶", ice="少冰", sugar="微糖")
-order_drink(**my_order)
-```
-
-> 使用 `**字典` 拆解傳入時，字典的鍵（key）名稱必須與函式參數名稱相符（除非函式本身有 `**kwargs` 可以接收多餘的鍵值）。
 
 ---
 
-## 第 6 步：實戰解讀 Python 內建函式與符號總整理
+## 五、實戰解讀 Python 內建函式簽章
 
-學會以上規則後，現在你可以直接看懂 Python 官方文件或 VS Code 彈出的函式提示了！試著看這兩個最常用的內建函式：
+掌握上述語法後，便能輕鬆解讀 Python 官方內建函式的規格簽章。
 
-### 實戰 1：`print(*objects, sep=' ', end='\n', file=None, flush=False)`
+### 5.1 `print()` 函式解析與 `sep` / `end` 應用
+官方定義簽章：
+```python
+print(*objects, sep=' ', end='\n', file=None, flush=False)
+```
+- `*objects`：允許傳入 0 個或任意多個位置引數。
+- `sep` 與 `end`：出現在 `*objects` 後方，屬於**僅限關鍵字引數**，必須以 `名稱=值` 指定。
 
-1. **`*objects`**：表示 `print()` 可以接收任意數量的位置引數（所以 `print("A", "B", "C")` 可以印好幾個值）。
-2. **`sep=' '`、`end='\n'` 在 `*objects` 後面**：它們是僅限關鍵字引數，所以想改變分隔字元或結尾符號時，**必須寫名稱**，例如 `print("A", "B", sep="-", end="!\n")`。
+#### 程式碼範例 (`Cell 18-19`)
+```python
+print('a', 'b', 1, 67, 89)
+# 輸出：a b 1 67 89
 
-### 實戰 2：`sorted(iterable, /, *, key=None, reverse=False)`
+print('a', 'b', 1, 67, 89, sep='-')
+# 輸出：a-b-1-67-89
 
-1. **`iterable` 在 `/` 左邊**：只能依位置傳入（例如 `sorted([3, 1, 2])`），不能寫 `sorted(iterable=[3, 1, 2])`。
-2. **`key` 與 `reverse` 在 `*` 右邊**：必須寫出引數名稱（例如 `sorted([3, 1, 2], reverse=True)`），不能寫成 `sorted([3, 1, 2], True)`。
-
-### 特殊符號速查總表
-
-| 符號 / 寫法 | 出現位置 | 代表意思與規則 | 範例 |
-| :--- | :--- | :--- | :--- |
-| `/` | 定義函式 `def` | `/` **左邊**的參數僅限用**位置**傳入 | `def f(a, /):` → `f(1)` |
-| `*`（單獨一個） | 定義函式 `def` | `*` **右邊**的參數必須寫**引數名稱** | `def f(*, b):` → `f(b=2)` |
-| `*args` | 定義函式 `def` | 接收任意數量**位置引數**，打包成 `tuple` | `def f(*args):` |
-| `**kwargs` | 定義函式 `def` | 接收任意數量**關鍵字引數**，打包成 `dict` | `def f(**kwargs):` |
-| `*序列` | 呼叫函式時 | 把 `list` / `tuple` **拆解**成多個位置引數 | `f(*[1, 2])` → `f(1, 2)` |
-| `**字典` | 呼叫函式時 | 把 `dict` **拆解**成多個 `key=value` 引數名稱 | `f(**{"b": 2})` → `f(b=2)` |
+print('a', 'b', 1, 67, 89, end='讚啦!\n')
+# 輸出：a b 1 67 89讚啦!
+```
 
 ---
 
-## 練習題
+### 5.2 `sorted()` 函式解析與 `reverse` 應用
+官方定義簽章：
+```python
+sorted(iterable, /, *, key=None, reverse=False)
+```
+- `iterable`：在 `/` 左側，表示被排序的序列**只能用位置傳入**。
+- `key` 與 `reverse`：在單獨 `*` 右側，屬於**僅限關鍵字引數**，欲反轉排序時必須明確寫出 `reverse=True`。
 
-請先自己動手寫寫看，再對照下方提示檢查：
+#### 程式碼範例 (`Cell 20-21`)
+```python
+result = sorted([8, 92, 63, 75], reverse=True)
+# 輸出：[92, 75, 63, 8]
+```
 
-1. 有一個函式 `def make_coffee(beans, milk="全脂鮮奶", sugar=0):`。請練習用以下兩種方式呼叫它：
-   - 全部用**位置引數**點一杯 `"義式深焙"`、`"燕麥奶"`、糖度 `1`。
-   - 保留預設牛奶，只把糖度改為 `2`（請使用**位置引數 + 引數名稱**混用）。
-2. 觀察下方函式定義，判斷哪幾行呼叫會出錯，並試著修改為正確的呼叫方式：
+---
+
+## 六、進階呼叫技巧：引數解包（Unpacking）
+
+星號除了用於定義函式時「打包」，在**呼叫函式**時則代表「解包」：
+
+1. **單星號 `*可迭代物件`**：解開串列（List）或元組（Tuple），將元素按位置依序傳入。
    ```python
-   def create_ticket(event, /, seat, *, price, vip=False):
-       print(event, seat, price, vip)
+   def add_three(a, b, c):
+       return a + b + c
 
-   create_ticket("Python 年會", "A12", price=1200)
-   create_ticket(event="Python 年會", seat="A12", price=1200)
-   create_ticket("Python 年會", "A12", 1200, True)
+   numbers = [10, 20, 30]
+   print(add_three(*numbers))  # 等同於 add_three(10, 20, 30) -> 輸出：60
    ```
-3. 寫一個函式 `average_score(*scores)`，可以傳入任意多個成績並印出平均分數（若沒有傳入任何成績，則印出 `"尚無成績"`）。
-4. 已有資料 `data = {"title": "Python 講座", "room": "301"}` 與函式 `def announce(title, room, time="14:00"):`，請用 `**` 拆解 `data` 來呼叫 `announce`，並同時把 `time` 改為 `"10:00"`。
+2. **雙星號 `**字典`**：解開字典（Dictionary），將鍵值對以關鍵字引數傳入。
+   ```python
+   drink_order = {
+       "drink": "珍珠奶茶",
+       "ice": "少冰",
+       "sugar": "微糖",
+   }
+   order_drink(**drink_order)  # 輸出：點餐：珍珠奶茶（少冰 / 微糖）
+   ```
 
-提示：
+---
 
+## 七、特殊符號速查對照表
+
+| 符號 / 寫法 | 出現情境 | 角色與作用 | 典型範例 |
+| :--- | :--- | :--- | :--- |
+| `/` | `def` 宣告中 | 劃定分界：其**左邊**參數為**僅限位置**傳遞 | `def f(a, /):` |
+| `*`（單獨） | `def` 宣告中 | 劃定分界：其**右邊**參數為**僅限關鍵字**傳遞 | `def f(*, b):` |
+| `*args` | `def` 宣告中 | **打包**：將不定量的位置引數組裝成 `tuple` | `def f(*args):` |
+| `**kwargs` | `def` 宣告中 | **打包**：將不定量的關鍵字引數組裝成 `dict` | `def f(**kwargs):` |
+| `*iterable` | 函式呼叫時 | **解包**：將串列或元組解開為個別位置引數 | `f(*[1, 2])` |
+| `**dict` | 函式呼叫時 | **解包**：將字典解開為 `key=value` 關鍵字引數 | `f(**{"a": 1})` |
+
+---
+
+## 八、常見錯誤與 Traceback 排除指南
+
+| 錯誤類型 | 常見觸發情境 | 範例與診斷方式 | 修復對策 |
+| :--- | :--- | :--- | :--- |
+| `SyntaxError: positional argument follows keyword argument` | 呼叫時位置引數排在關鍵字引數後面 | `func(a=1, 2)` | 將位置引數全數移至前面，或統一改為關鍵字引數傳遞。 |
+| `TypeError: ... got some positional-only arguments passed as keyword arguments` | 呼叫時對 `/` 左側的參數寫出名稱 | `calc_bmi(weight=65, height=1.75)` | 移除參數名稱，單純傳入數值 `calc_bmi(65, 1.75)`。 |
+| `TypeError: ... takes X positional arguments but Y were given` | 對 `*` 右側的僅限關鍵字參數用位置傳入 | `send_email("a@b.com", "Title", True)` | 為該引數補上名稱：`send_email("a@b.com", subject="Title", urgent=True)`。 |
+| `TypeError: ... got multiple values for argument` | 同一參數先用位置傳入，後續又以關鍵字指定 | `describe_pet("狗", animal="貓")` | 檢查引數對應，移除多餘的重複指派。 |
+
+---
+
+## 九、課堂自我檢測題（附詳解）
+
+### 題目一：觀念辨析
+觀察以下函式宣告：
 ```python
-# 第 3 題提示：先檢查 if len(scores) == 0: ...，再用 sum(scores) / len(scores)
-# 第 4 題提示：呼叫時可以寫 announce(**data, time="10:00")
+def setup_server(host, port=8080, /, timeout=30, *, secure=False, **options):
+    pass
+```
+請問下列何者為**錯誤**的呼叫方式？
+- (A) `setup_server("127.0.0.1", 9000, 60, secure=True)`
+- (B) `setup_server("127.0.0.1", timeout=15, secure=True)`
+- (C) `setup_server(host="127.0.0.1", port=8080, secure=True)`
+- (D) `setup_server("127.0.0.1", 8080, timeout=10, secure=False, debug=True)`
+
+> **詳解**：
+> 正確答案為 **(C)**。
+> 原因：`host` 與 `port` 位於 `/` 左側，屬於「僅限位置參數」，呼叫時絕對不能使用 `host=...` 或 `port=...` 的形式傳入，否則會丟出 `TypeError`。
+
+---
+
+### 題目二：程式追蹤
+試推導下列程式碼的執行結果：
+```python
+def calculate(base, *values, scale=1):
+    total = base + sum(values)
+    return total * scale
+
+data = [2, 3, 4]
+print(calculate(10, *data, scale=2))
 ```
 
----
-
-## 常見問題
-
-- **`SyntaxError: positional argument follows keyword argument`**
-  呼叫時把位置引數寫在引數名稱後面了（例如 `func(a=1, 2)`）。請把所有位置引數移到引數名稱之前，或全部改寫成引數名稱。
-- **`TypeError: ... got some positional-only arguments passed as keyword arguments`**
-  你幫寫在 `/` 左邊的參數加上了引數名稱。請改回直接依位置傳入值，不要寫 `參數名=`。
-- **`TypeError: ... takes X positional arguments but Y were given`**
-  多半是因為不小心把寫在 `*` 右邊（僅限關鍵字）的參數用位置傳入了，或是真的多傳了引數。請為 `*` 右邊的參數補上 `參數名=`。
-- **`TypeError: ... got multiple values for argument '...'`**
-  同一個參數同時被位置引數和引數名稱各指定了一次（例如 `describe_pet("狗", animal="貓")`）。請檢查並移除重複指定的引數。
+> **詳解**：
+> 輸出為 **`38`**。
+> 解析步驟：
+> 1. `calculate` 接收到 `base = 10`。
+> 2. `*data` 解包傳入 `2, 3, 4`，被 `*values` 打包為元組 `(2, 3, 4)`。
+> 3. `total = 10 + sum((2, 3, 4)) = 10 + 9 = 19`。
+> 4. 最後乘上 `scale=2`，結果為 `19 * 2 = 38`。
 
 ---
 
-## 完成檢查
+### 題目三：動手實作
+請編寫一個名為 `log_message` 的函式，規格如下：
+1. `level`（日誌等級）：僅限位置傳遞（如 `"INFO"`、`"ERROR"`）。
+2. `message`（訊息內容）：位置或名稱皆可。
+3. `timestamp`：僅限關鍵字傳遞，預設為 `"NOW"`。
+4. `tags`：可接收任意數量的額外標籤關鍵字（如 `module="auth"`, `user_id=12`），以字典形式輸出。
 
-- [ ] 能說出參數（Parameter）與引數（Argument）的差別。
-- [ ] 能用位置引數、引數名稱（含混用順序）與預設值正確呼叫函式。
-- [ ] 能分辨 `/` 左邊與 `*` 右邊的參數在呼叫時有什麼限制。
-- [ ] 能區分 `*` / `**` 在「定義函式（打包成 `tuple` / `dict`）」與「呼叫函式（拆解傳入）」時的不同用法。
-- [ ] 能看懂 `print(*objects, sep=' ', end='\n')` 與 `sorted(iterable, /, *, key=None, reverse=False)` 的呼叫規則。
+#### 參考解答：
+```python
+def log_message(level, /, message, *, timestamp="NOW", **tags):
+    print(f"[{timestamp}] [{level}] {message} | Tags: {tags}")
+
+# 呼叫示範：
+log_message("ERROR", "登入失敗", timestamp="2026-11-18 15:30", ip="192.168.1.1", retry=3)
+# 輸出：[2026-11-18 15:30] [ERROR] 登入失敗 | Tags: {'ip': '192.168.1.1', 'retry': 3}
+```
